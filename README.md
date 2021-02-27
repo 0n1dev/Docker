@@ -9,7 +9,7 @@
 
 리눅스 컨테이너는 운영체제 수준의 가상화 기술로 리눅스 커널을 공유하며, 프로세스를 격리된 환경에서 실행시키는 기술이다.
 
-![가상머신과 도커의 차이](https://raw.githubusercontent.com/0n1dev/Docker/main/%EA%B0%80%EC%83%81%EB%A8%B8%EC%8B%A0%EA%B3%BC%20%EB%8F%84%EC%BB%A4%20%EC%B0%A8%EC%9D%B4.png)
+![가상머신과 도커의 차이](./img/vm_docker.png)
 
 ### 리눅스 컨테이너의 특징
 
@@ -63,27 +63,92 @@
 ---
 도커는 리눅스 컨테이너 기술이라 윈도우나 macOS에 설치하면 가상머신에 설치가됩니다. 이 글에서는 Linux를 기반으로 설치하는 방법에 대해서 정리하겠습니다.
 
-```
-curl -fsSL https://get.docker.com/ | sudo sh
-```
+> curl -fsSL https://get.docker.com/ | sudo sh
 
 ### sudo 없이 사용
 
 Docker는 root 권한이 필요하여 root가 아닌 사용자가 sudo없이 사용하려면 해당 사용자를 docker 그룹에 추가해야합니다.
 
-```
-sudo usermod -aG docker $USER # 현재 접속중인 사용자에게 권한주기
-```
+
+> sudo usermod -aG docker $USER # 현재 접속중인 사용자에게 권한주기
 
 ## 2. 설치 확인하기
 
-```
-docker version
-```
+> docker version
 
-### OUTPUT
+![도커 버전](./img/docker_version.png)
 
-![도커 버전 확인](https://raw.githubusercontent.com/0n1dev/Docker/main/docker%20version.png)
+도커의 버전 정보는 서버와 클라이언트가 모두 보여야한다.
 
-Client와 Server 정보가 정상적으로 출력된다면 설치가 완료된 것 입니다.
+![도커 커맨드](./img/docker_command.jpg)
 
+도커 커맨드를 입력하면 도커 클라이언트가 호스트에 설치된 도커 데몬에서 명령어 처리 후 클라이언트에 출력
+
+## 2. 도커 기본 명령어
+---
+
+### run - 컨테이너 실행
+
+> docker run [OPTION] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+
+- -d : detached mode (백그라운드 모드)
+- -p : 호스트와 컨테이너의 포트를 연결
+- -v : 호스트와 컨테이너의 디렉토리를 연결
+- -e : 컨테이너 내에서 사용할 환경변수 설정
+- --name : 컨테이너 이름 설정
+- --rm : 프로세스 종료시 컨테이너 자동 제거
+- -it : -i와 -t를 동시에 사용한 것으로 터미널 입력
+- --network : 네트워크 연결
+- --link : 컨테이너 연결 [컨테이너명:별칭]
+
+**예시**
+
+> docker run ubuntu:20.04
+
+![도커 run](./img/docker_run.png)
+
+run 명령어 사용 시 이미지가 있는지 없는지 체크 후 이미지가 없다면 다운로드(pull) 후 컨테이너를 생성(create) 그리고 시작(start)
+
+컨테이너는 정상적으로 실행되었지만 다른 추가 명령어가 없기 때문에 바로 종료(컨테이너는 프로세스이기 때문에 실행중인 프로세스가 없으면 종료 됨)
+
+> docker run --rm -it ubuntu:20.04 /bin/sh
+
+![도커 run2](./img/docker_run2.png)
+
+-it 옵션을 추가하여 터미널에서 /etc/issue 파일 확인. 종료시 --rm 명령어 때문에 삭제.
+
+> docker run --rm -p 5678:5678 hashicorp/http-echo -text="hello world"
+
+![도커 run3](./img/docker_run3.png)
+
+-p 옵션을 통해 hashicorp/http-echo 컨테이너 포트와 호스트 포트를 5678로 연결
+
+> curl localhost:5678
+
+curl 명령어를 통해 해당 포트에 접속하면 hello world라는 텍스트가 출력
+
+**예시2 Redis 실행**
+
+> docker run --rm -p 1234:6379 redis
+
+![도커 redis](./img/docker_redis.png)
+
+**예시3 MySQL 실행**
+
+> docker run -d -p 3306:3306 \
+>   -e MYSQL_ALLOW_EMPTY_PASSWORD=true \
+>   --name mysql \
+>   mysql:5.7
+
+![도커 mysql](./img/docker_mysql.png)
+
+- -d 옵션을 통해 백그라운드 모드로 실행 
+- -e 옵션을 통해 MYSQL 패스워드 생략 환경변수 설정 
+- --name 옵션을 통해 컨테이너 이름 mysql 로 지정
+
+> docker exec -it mysql mysql
+
+- exec 옵션은 컨테이너 내부에서 커맨드를 수행하도록 외부에서 입력 (docker exec [OPTION] [컨테이너 이름 혹은 아이디의 앞부분] [커맨드])
+- 보통 컨테이너가 실행중일 때 해당 컨테이너에 명령어를 실행시키고 싶을 때 사용
+
+![도커 mysql](./img/docker_mysql2.png)
