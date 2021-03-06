@@ -152,3 +152,90 @@ curl 명령어를 통해 해당 포트에 접속하면 hello world라는 텍스�
 - 보통 컨테이너가 실행중일 때 해당 컨테이너에 명령어를 실행시키고 싶을 때 사용
 
 ![도커 mysql](./img/docker_mysql2.png)
+
+### ps 명령어
+
+> docker ps
+
+실행중인 컨테이너 목록을 확인
+
+![도커 ps](./img/docker_ps.png)
+
+> docker ps -a
+
+중지 된 컨테이너 포함한 목록을 확인
+
+![도커 ps -a](./img/docker_psa.png)
+
+### stop 명령어
+
+> docker stop [OPTION] CONTAINER
+
+실행중인 컨테이너를 중지하는 명령어(띄어쓰기를 통해 여러개 중지 가능)
+
+![도커 stop](./img/docker_stop.png)
+
+### rm 명령어
+
+> docker rm [OPTIONS] CONTAINER
+
+종료된 컨테이너를 완전히 제거하는 명령어
+
+![도커 rm](./img/docker_rm.png)
+
+> docker logs [OPTIONS] CONTAINER
+
+컨테이너의 로그를 확인하는 명령어
+
+- -f 옵션 : 대기하면서 추가적인 로그가 생기면 계속해서 보여줌
+- --tail [line] 옵션 : 원하는 줄 수 출력
+
+### images 명령어
+
+> docker images
+
+도커가 다운로드한 이미지 목록을 보는 명령어
+
+![도커 rm](./img/docker_images.png)
+
+### pull 명령어
+
+> docker pull [OPTIONS] NAME[:TAG|@DIGEST]
+
+이미지 다운로드 명령어
+
+#### 예시
+
+> docker pull ubuntu:18.04
+
+run 명령어를 사용하면 이미지가 없다면 자동으로 pull 해준다.
+
+### network create 명령어
+
+> docker network create [OPTIONS] NETWORK
+
+도커 컨테이너끼리 이름으로 통신할 수 있는 가상 네트워크를 만듬
+
+#### 예시
+
+> docker network create app-network
+
+> docker network connect app-network mysql
+
+app-network라는 네트워크 생성 후 mysql을 네트워크에 연결
+
+### volume mount (-v) 명령어
+
+컨테이너가 사라지면 컨테이너에서 생성된 파일이 모두 사라지기 때문에 데이터 볼륨을 컨테이너에 추가해서 사용해야한다.
+
+> docker run -d -p 3306:3306 \ <br>
+>  -e MYSQL_ALLOW_EMPTY_PASSWORD=true \ <br>
+>  --name mysql \ <br>
+>  -v /my/test/dir:/var/lib/mysql \ <br>
+>  mysql:5.7
+
+이전에 mysql 생성하는곳에 -v 옵션을 주었다. 호스트의 /my/test/dir 디렉토리를 컨테이너의 /var/lib/mysql 디렉토리로 마운트 하였다.
+
+호스트 경로에 가보면 해당 데이터가 호스트에 저장되는것을 알 수 있다.
+
+![도커 rm](./img/docker_v.png)
